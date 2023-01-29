@@ -12,6 +12,7 @@ class Volcano:
     def __init__(self, main_window):
         self.am_path_ = ""
         self.pm_path_ = ""
+        self.inventory_path_ = "../doc/Inventory.xlsx"
         self.main_ = main_window
 
 
@@ -20,21 +21,30 @@ class Volcano:
         self.pm_sales_button_ = tk.Button(main_window, text="오후 판매현황", command= self.update_pm)
         self.pm_sales_button_.place(x=10, y=50)
 
+        self.inven_button_ = tk.Button(main_window, text="쟁여놓는약 변경", command=self.update_inventory)
+        self.inven_button_.place(x=10, y=100)
+
         self.am_path_label_ = tk.Label(main_window, text="None")
         self.am_path_label_.place(x=120, y=12)
         self.pm_path_label_ = tk.Label(main_window, text="None")
         self.pm_path_label_.place(x=120, y=52)
+        self.inven_path_label_ = tk.Label(main_window, text= self.inventory_path_)
+        self.inven_path_label_.place(x=130, y=102)
 
     def update_am(self):
         path = self.__get_file_path()
         self.am_path_label_.config(text=path)
-        am_path_ = path
+        self.am_path_ = path
 
     def update_pm(self):
         path = self.__get_file_path()
         self.pm_path_label_.config(text=path)
-        pm_path_ = path
+        self.pm_path_ = path
 
+    def update_inventory(self):
+        path = self.__get_file_path()
+        self.inven_path_label_.config(text=path)
+        self.inventory_path_ = path
 
     def update_path(self, label, which_path):
         path = self.get_file_path(which_path)
