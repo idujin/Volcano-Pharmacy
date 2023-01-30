@@ -7,7 +7,7 @@ class Volcano:
     def __init__(self, main_window):
         self.am_path = ""
         self.pm_path = ""
-        self.inventory_path = "../doc/Inventory2.xlsx"
+        self.inventory_path = "../doc/Inventory.xlsx"
         self.main = main_window
         self.df_am =pd.DataFrame()
         self.df_pm =pd.DataFrame()
