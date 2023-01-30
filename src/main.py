@@ -1,13 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 import pandas as pd
-from enum import Enum
 import numpy as np
-class WhichPath(Enum):
-    AM = 0
-    PM = 1
-    INVEN =2
-
 
 class Volcano:
     def __init__(self, main_window):
