@@ -2,12 +2,22 @@ import tkinter as tk
 from tkinter import filedialog
 import pandas as pd
 import numpy as np
+import os
+import sys
 
 class Volcano:
     def __init__(self, main_window):
         self.am_path = ""
         self.pm_path = ""
-        self.inventory_path = "../doc/Inventory.xlsx"
+        self.doc_path =""
+        if getattr(sys, 'frozen', False):
+            self.doc_path = os.path.join(os.path.dirname(os.path.abspath(sys.executable)),"doc")
+        else:
+            self.doc_path = os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(__file__))),"doc")
+        if not os.path.exists(self.doc_path):
+            os.makedirs(self.doc_path) 
+        self.inventory_path =  os.path.join(self.doc_path,"Inventory.xls")
+
         self.main = main_window
         self.df_am =pd.DataFrame()
         self.df_pm =pd.DataFrame()
@@ -28,11 +38,11 @@ class Volcano:
         self.inven_path_label_ = tk.Label(main_window, text= self.inventory_path)
         self.inven_path_label_.place(x=130, y=92)
 
-        self.am_export_button_ = tk.Button(main_window, text = "오전 필요수량 계산", height= 2, width=10,
+        self.am_export_button_ = tk.Button(main_window, text = "오전 필요수량 계산", height= 2, width=14,
                                            command = self.export_am_order)
         self.am_export_button_.place(x=650, y=10)
 
-        self.pm_export_button_ = tk.Button(main_window, text="오후 필요수량 계산", height=2, width=10,
+        self.pm_export_button_ = tk.Button(main_window, text="오후 필요수량 계산", height=2, width=14,
                                            command = self.export_pm_order)
         self.pm_export_button_.place(x=650, y=70)
 
@@ -64,8 +74,11 @@ class Volcano:
             if(code in exclude_codes):
                 drop_list.append(sales.index[i])
         sales_export = sales.drop(drop_list)
+
         try:
-            sales_export.to_excel("../doc/export_AM.xlsx")
+            filename = os.path.join(self.doc_path,"Export_AM.xls")
+            sales_export.to_excel(filename, encoding='utf-8-sig')
+
             pop_err = tk.Toplevel(self.main)
             pop_err.geometry("250x50")
             pop_err.title("Message")
@@ -120,7 +133,9 @@ class Volcano:
                 drop_list.append(i)
         sales_export = df_pm_only.drop(drop_list)
         try:
-            sales_export.to_excel("../doc/export_PM.xlsx")
+            filename = os.path.join(self.doc_path,"Export_PM.xls")
+            sales_export.to_excel(filename, encoding='utf-8-sig')
+
             pop_err = tk.Toplevel(self.main)
             pop_err.geometry("250x50")
             pop_err.title("Message")
@@ -136,14 +151,30 @@ class Volcano:
         path = self.__get_file_path()
         self.am_path_label_.config(text=path)
         self.am_path = path
-        df = self.__read_excel_file(self.am_path)
+        try:
+            df = self.__read_excel_file(self.am_path)
+        except:
+            pop_err = tk.Toplevel(self.main)
+            pop_err.geometry("250x50")
+            pop_err.title("Error")
+            tk.Label(pop_err, text="오전 파일을 확인하세요.").pack()
+            return
+
         self.df_am = df[["약품명칭", "약품코드", "처방수량"]]
 
     def update_pm(self):
         path = self.__get_file_path()
         self.pm_path_label_.config(text=path)
         self.pm_path = path
-        df = self.__read_excel_file(self.pm_path)
+        try:
+            df = self.__read_excel_file(self.pm_path)
+        except:
+            pop_err = tk.Toplevel(self.main)
+            pop_err.geometry("250x50")
+            pop_err.title("Error")
+            tk.Label(pop_err, text="오후 파일을 확인하세요.").pack()
+            return
+
         self.df_pm = df[["약품명칭", "약품코드", "처방수량"]]
 
     def update_inventory(self):
@@ -169,7 +200,7 @@ class Volcano:
         try:
             df = pd.read_excel(path)
         except:
-            raise Exception("재고 파일을 확인하세요.")
+            raise Exception("파일을 확인하세요.")
         return df
 
 if __name__ == '__main__':
